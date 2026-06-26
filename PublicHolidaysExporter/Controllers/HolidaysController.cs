@@ -1,6 +1,12 @@
-﻿namespace PublicHolidaysExporter.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace PublicHolidaysExporter.Controllers
 {
-    public class HolidaysController
+    public class HolidaysController : Controller
     {
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }
