@@ -16,18 +16,24 @@ namespace PublicHolidaysExporter.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var model = new HolidaySearchViewModel();
+            var model = new HolidaySearchViewModel
+            {
+                Countries = await _openHolidaysService.GetCountriesAsync()
+            };
+
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Index(HolidaySearchViewModel model)
         {
+            model.Countries = await _openHolidaysService.GetCountriesAsync();
+
             if (!ModelState.IsValid)
             {
-                return View(model);   
+                return View(model);
             }
 
             model.CountryCode = model.CountryCode.ToUpper();
@@ -35,9 +41,12 @@ namespace PublicHolidaysExporter.Controllers
 
             try
             {
-                model.Holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Year, model.Language);
+                model.Holidays = await _openHolidaysService.GetPublicHolidaysAsync(
+                    model.CountryCode,
+                    model.Year,
+                    model.Language);
             }
-            catch 
+            catch
             {
                 ModelState.AddModelError(string.Empty, "Could not retrieve holidays from the API. Please try again later.");
             }
@@ -50,6 +59,7 @@ namespace PublicHolidaysExporter.Controllers
         {
             if (!ModelState.IsValid)
             {
+                model.Countries = await _openHolidaysService.GetCountriesAsync();
                 return View("Index", model);
             }
 

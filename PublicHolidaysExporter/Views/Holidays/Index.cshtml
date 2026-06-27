@@ -15,8 +15,17 @@
 
     <form asp-action="Index" method="post" class="row g-3">
         <div class="col-md-4">
-            <label asp-for="CountryCode" class="form-label">Country Code</label>
-            <input asp-for="CountryCode" class="form-control" placeholder="MT" />
+            <label asp-for="CountryCode" class="form-label">Country</label>
+            <select asp-for="CountryCode" class="form-select">
+                <option value="">Select a country</option>
+
+                @foreach (var country in Model.Countries)
+                {
+                    <option value="@country.IsoCode">
+                        @country.Name (@country.IsoCode)
+                    </option>
+                }
+            </select>
             <span asp-validation-for="CountryCode" class="text-danger"></span>
         </div>
 
@@ -48,7 +57,7 @@
     {
         <hr class="my-4"/>
 
-        <h2 class="h4 mb=3">Results</h2>
+        <h2 class="h4 mb-3">Results</h2>
 
         <form asp-action="DownloadCsv" method="post" class="mb-3">
             <input type="hidden" asp-for="CountryCode" />

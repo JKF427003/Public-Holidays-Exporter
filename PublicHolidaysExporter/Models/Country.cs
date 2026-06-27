@@ -1,8 +1,8 @@
 ﻿namespace PublicHolidaysExporter.Models
 {
-    public class Holiday
+    public class Country
     {
-        public DateTime Date { get; set; }
+        public string IsoCode { get; set; } = string.Empty;
 
         public string Name { get; set; } = string.Empty;
     }

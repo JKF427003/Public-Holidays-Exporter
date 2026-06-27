@@ -33,6 +33,25 @@ namespace PublicHolidaysExporter.Services
             }).ToList();
         }
 
+        public async Task<List<Country>> GetCountriesAsync()
+        {
+            var apiCountries = await _httpClient.GetFromJsonAsync<List<OpenCountryResponse>>("Countries");
+
+            if (apiCountries == null)
+            {
+                return new List<Country>();
+            }
+
+            return apiCountries
+                .Select(country => new Country
+                {
+                    IsoCode = country.IsoCode,
+                    Name = country.Name.FirstOrDefault()?.Text ?? country.IsoCode
+                })
+                .OrderBy(country => country.Name)
+                .ToList();
+        }
+
         private class OpenHolidayResponse
         {
             public DateTime StartDate { get; set; }
@@ -58,6 +77,20 @@ namespace PublicHolidaysExporter.Services
             var fallbackName = apiHoliday.Name.FirstOrDefault(name => !string.IsNullOrWhiteSpace(name.Text));
 
             return fallbackName?.Text ?? "Unkown Holiday";
+        }
+
+        private class OpenCountryResponse
+        {
+            public string IsoCode { get; set; } = string.Empty;
+
+            public List<OpenCountryName> Name { get; set; } = new();
+        }
+
+        private class OpenCountryName
+        {
+            public string Language { get; set; } = string.Empty;
+
+            public string Text { get; set; } = string.Empty;
         }
     }
 }

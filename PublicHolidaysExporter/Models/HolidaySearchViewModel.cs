@@ -17,5 +17,7 @@ namespace PublicHolidaysExporter.Models
         public string Language { get; set; } = "EN";
 
         public List<Holiday> Holidays { get; set; } = new();
+        
+        public List<Country> Countries { get; set; } = new();
     }
 }
