@@ -7,10 +7,12 @@ namespace PublicHolidaysExporter.Controllers
     public class HolidaysController : Controller
     {
         private readonly IOpenHolidaysService _openHolidaysService;
+        private readonly ICsvExportService _csvExportService;
 
-        public HolidaysController(IOpenHolidaysService openHolidaysService)
+        public HolidaysController(IOpenHolidaysService openHolidaysService, ICsvExportService csvExportService)
         {
             _openHolidaysService = openHolidaysService;
+            _csvExportService = csvExportService;
         }
 
         [HttpGet]
@@ -41,6 +43,23 @@ namespace PublicHolidaysExporter.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DownloadCsv(HolidaySearchViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Index", model);
+            }
+
+            var holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode.ToUpper(), model.Year, model.Language.ToUpper());
+
+            var csvBytes = _csvExportService.GenerateCsv(holidays);
+
+            var fileName = $"public-holidays-{model.CountryCode.ToUpper()}-{model.Year}.csv";
+
+            return File(csvBytes, "text/csv", fileName);
         }
     }
 }

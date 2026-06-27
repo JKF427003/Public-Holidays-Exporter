@@ -29,7 +29,7 @@ namespace PublicHolidaysExporter.Services
             return apiHolidays.Select(apiHoliday => new Holiday
             {
                 Date = apiHoliday.StartDate,
-                Name = apiHoliday.Name.FirstOrDefault()?.Text ?? "Unknown holiday"
+                Name = GetHolidayName(apiHoliday, language)
             }).ToList();
         }
 
@@ -42,7 +42,22 @@ namespace PublicHolidaysExporter.Services
 
         private class OpenHolidayName
         {
+            public string Language { get; set; } = string.Empty;
             public string Text { get; set; } = string.Empty;
+        }
+
+        private static string GetHolidayName(OpenHolidayResponse apiHoliday, string language)
+        {
+            var matchingName = apiHoliday.Name.FirstOrDefault(name => string.Equals(name.Language, language, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingName != null && !string.IsNullOrWhiteSpace(matchingName.Text))
+            {
+                return matchingName.Text;
+            }
+            
+            var fallbackName = apiHoliday.Name.FirstOrDefault(name => !string.IsNullOrWhiteSpace(name.Text));
+
+            return fallbackName?.Text ?? "Unkown Holiday";
         }
     }
 }
