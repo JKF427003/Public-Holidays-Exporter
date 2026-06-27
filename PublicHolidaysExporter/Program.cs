@@ -1,7 +1,11 @@
+using PublicHolidaysExporter.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+//builder.Services.AddScoped<IOpenHolidaysService, OpenHolidaysService>();
+builder.Services.AddHttpClient<IOpenHolidaysService, OpenHolidaysService>(client => { client.BaseAddress = new Uri("https://openholidaysapi.org/"); });
 
 var app = builder.Build();
 
