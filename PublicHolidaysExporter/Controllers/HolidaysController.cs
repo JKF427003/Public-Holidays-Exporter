@@ -103,7 +103,7 @@ namespace PublicHolidaysExporter.Controllers
 
             var holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Language, validFrom, validTo);
 
-            var csvBytes = _csvExportService.GenerateCsv(holidays);
+            var csvBytes = _csvExportService.GenerateCsv(holidays, model.CountryCode, model.Language, validFrom, validTo);
 
             var fileName = $"public-holidays-{model.CountryCode.Trim().ToUpper()}-{model.Year}.csv";
 

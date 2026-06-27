@@ -29,7 +29,9 @@ namespace PublicHolidaysExporter.Services
             return apiHolidays.Select(apiHoliday => new Holiday
             {
                 Date = apiHoliday.StartDate,
-                Name = GetHolidayName(apiHoliday, language)
+                Name = GetHolidayName(apiHoliday, language),
+                CountryCode = countryCode,
+                Language = language
             }).ToList();
         }
 
