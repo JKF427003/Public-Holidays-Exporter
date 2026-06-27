@@ -21,8 +21,8 @@
 
                 @foreach (var country in Model.Countries)
                 {
-                    <option value="@country.IsoCode">
-                        @country.Name (@country.IsoCode)
+                    <option value="@country.IsoCode.Trim().ToUpperInvariant()">
+                        @country.Name (@country.IsoCode.Trim().ToUpperInvariant())
                     </option>
                 }
             </select>
@@ -31,7 +31,13 @@
 
         <div class="col-md-4">
             <label asp-for="Year" class="form-label">Year</label>
-            <input asp-for="Year" class="form-control" />
+            <select asp-for="Year" class="form-select">
+                @foreach (var year in Model.AvailableYears)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+            <input type="hidden" id="YearHidden" name="Year" value="@Model.Year" disabled />
             <span asp-validation-for="Year" class="text-danger"></span>
         </div>
 
@@ -44,6 +50,25 @@
                 <option value="DE">German</option>
             </select>
             <span asp-validation-for="Language" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-check mt-4">
+                <input asp-for="UseDateRange" class="form-check-input" />
+                <label asp-for="UseDateRange" class="form-check-label">
+                    Use custom date range
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="StartDate" class="form-label">Start Date</label>
+            <input asp-for="StartDate" class="form-control" type="date" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="EndDate" class="form-label">End Date</label>
+            <input asp-for="EndDate" class="form-control" type="date" />
         </div>
 
         <div class="col-12">
@@ -63,7 +88,9 @@
             <input type="hidden" asp-for="CountryCode" />
             <input type="hidden" asp-for="Year" />
             <input type="hidden" asp-for="Language" />
-
+            <input type="hidden" asp-for="UseDateRange" />
+            <input type="hidden" asp-for="StartDate" />
+            <input type="hidden" asp-for="EndDate" />
             <button type="submit" class="btn btn-success">Download CSV</button>
         </form>
 
@@ -88,5 +115,32 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const useDateRangeCheckbox = document.getElementById("UseDateRange");
+        const yearSelect = document.getElementById("Year");
+        const yearHidden = document.getElementById("YearHidden");
+        const startDateInput = document.getElementById("StartDate");
+        const endDateInput = document.getElementById("EndDate");
+
+        function updateDateRangeFields() {
+            const useDateRange = useDateRangeCheckbox.checked;
+
+            startDateInput.disabled = !useDateRange;
+            endDateInput.disabled = !useDateRange;
+
+            yearSelect.disabled = useDateRange;
+            yearHidden.disabled = !useDateRange;
+            yearHidden.value = yearSelect.value;
+        }
+
+        useDateRangeCheckbox.addEventListener("change", updateDateRangeFields);
+
+        yearSelect.addEventListener("change", function () {
+            yearHidden.value = yearSelect.value;
+        });
+
+        updateDateRangeFields();
+    </script>
 }

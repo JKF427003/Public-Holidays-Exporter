@@ -15,12 +15,20 @@ namespace PublicHolidaysExporter.Controllers
             _csvExportService = csvExportService;
         }
 
+        private static List<int> GetAvailableYears()
+        {
+            var currentYear = DateTime.Today.Year;
+
+            return Enumerable.Range(currentYear - 20, 31).Reverse().ToList();
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var model = new HolidaySearchViewModel
             {
-                Countries = await _openHolidaysService.GetCountriesAsync()
+                Countries = await _openHolidaysService.GetCountriesAsync(),
+                AvailableYears = GetAvailableYears()
             };
 
             return View(model);
@@ -29,27 +37,49 @@ namespace PublicHolidaysExporter.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(HolidaySearchViewModel model)
         {
-            model.Countries = await _openHolidaysService.GetCountriesAsync();
+            model.CountryCode = model.CountryCode.Trim().ToUpperInvariant();
+            model.Language = model.Language.Trim().ToUpperInvariant();
 
-            if (!ModelState.IsValid)
+            ModelState.Clear();
+
+            var validFrom = new DateTime(model.Year, 1, 1);
+            var validTo = new DateTime(model.Year, 12, 31);
+
+            if (model.UseDateRange)
             {
+                if (!model.StartDate.HasValue || !model.EndDate.HasValue)
+                {
+                    ModelState.AddModelError(string.Empty, "Please enter both start and end dates.");
+                }
+                else if (model.StartDate.Value > model.EndDate.Value)
+                {
+                    ModelState.AddModelError(string.Empty, "Start date must be before end date.");
+                }
+                else
+                {
+                    validFrom = model.StartDate.Value;
+                    validTo = model.EndDate.Value;
+                }
+            }
+
+            if (!TryValidateModel(model) || !ModelState.IsValid)
+            {
+                model.Countries = await _openHolidaysService.GetCountriesAsync();
+                model.AvailableYears = GetAvailableYears();
                 return View(model);
             }
 
-            model.CountryCode = model.CountryCode.ToUpper();
-            model.Language = model.Language.ToUpper();
-
             try
             {
-                model.Holidays = await _openHolidaysService.GetPublicHolidaysAsync(
-                    model.CountryCode,
-                    model.Year,
-                    model.Language);
+                model.Holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Language, validFrom, validTo);
             }
             catch
             {
                 ModelState.AddModelError(string.Empty, "Could not retrieve holidays from the API. Please try again later.");
             }
+
+            model.Countries = await _openHolidaysService.GetCountriesAsync();
+            model.AvailableYears = GetAvailableYears();
 
             return View(model);
         }
@@ -57,17 +87,25 @@ namespace PublicHolidaysExporter.Controllers
         [HttpPost]
         public async Task<IActionResult> DownloadCsv(HolidaySearchViewModel model)
         {
-            if (!ModelState.IsValid)
+            model.CountryCode = model.CountryCode.Trim().ToUpperInvariant();
+            model.Language = model.Language.Trim().ToUpperInvariant();
+
+            ModelState.Clear();
+
+            var validFrom = new DateTime(model.Year, 1, 1);
+            var validTo = new DateTime(model.Year, 12, 31);
+
+            if (model.UseDateRange && model.StartDate.HasValue && model.EndDate.HasValue)
             {
-                model.Countries = await _openHolidaysService.GetCountriesAsync();
-                return View("Index", model);
+                validFrom = model.StartDate.Value;
+                validTo = model.EndDate.Value;
             }
 
-            var holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode.ToUpper(), model.Year, model.Language.ToUpper());
+            var holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Language, validFrom, validTo);
 
             var csvBytes = _csvExportService.GenerateCsv(holidays);
 
-            var fileName = $"public-holidays-{model.CountryCode.ToUpper()}-{model.Year}.csv";
+            var fileName = $"public-holidays-{model.CountryCode.Trim().ToUpper()}-{model.Year}.csv";
 
             return File(csvBytes, "text/csv", fileName);
         }

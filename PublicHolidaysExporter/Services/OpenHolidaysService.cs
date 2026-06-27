@@ -12,12 +12,12 @@ namespace PublicHolidaysExporter.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<Holiday>> GetPublicHolidaysAsync(string countryCode, int year, string language)
+        public async Task<List<Holiday>> GetPublicHolidaysAsync(string countryCode, string language, DateTime validFrom, DateTime validTo)
         {
-            var validFrom = $"{year}-01-01";
-            var validTo = $"{year}-12-31";
+            var validFromText = validFrom.ToString("yyyy-MM-dd");
+            var validToText = validTo.ToString("yyyy-MM-dd");
 
-            var url = $"PublicHolidays?countryIsoCode={countryCode.ToUpper()}" + $"&languageIsoCode={language.ToUpper()}" + $"&validFrom={validFrom}" + $"&validTo={validTo}";
+            var url = $"PublicHolidays?countryIsoCode={countryCode.ToUpper()}" + $"&languageIsoCode={language.ToUpper()}" + $"&validFrom={validFromText}&validTo={validToText}";
 
             var apiHolidays = await _httpClient.GetFromJsonAsync<List<OpenHolidayResponse>>(url);
 
@@ -45,7 +45,7 @@ namespace PublicHolidaysExporter.Services
             return apiCountries
                 .Select(country => new Country
                 {
-                    IsoCode = country.IsoCode,
+                    IsoCode = country.IsoCode.Trim().ToUpperInvariant(),
                     Name = country.Name.FirstOrDefault()?.Text ?? country.IsoCode
                 })
                 .OrderBy(country => country.Name)

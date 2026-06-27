@@ -4,14 +4,13 @@ namespace PublicHolidaysExporter.Models
 {
     public class HolidaySearchViewModel
     {
-        [Required]
-        [StringLength(2, MinimumLength = 2)]
-        [RegularExpression("^[A-Za-z]{2}$", ErrorMessage = "Enter a valid 2-letter country code, for example MT, IT, or DE.")]
+        [Required(ErrorMessage = "Please select a country.")]
         public string CountryCode { get; set; } = string.Empty;
 
         [Required]
         [Range(1900, 2100, ErrorMessage = "Enter a valid year.")]
         public int Year { get; set; } = DateTime.Today.Year;
+        public List<int> AvailableYears { get; set; } = new();
 
         [Required]
         public string Language { get; set; } = "EN";
@@ -19,5 +18,13 @@ namespace PublicHolidaysExporter.Models
         public List<Holiday> Holidays { get; set; } = new();
         
         public List<Country> Countries { get; set; } = new();
+
+        public bool UseDateRange { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? EndDate { get; set; }
     }
 }
