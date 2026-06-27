@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using PublicHolidaysExporter.Models;
 using PublicHolidaysExporter.Services;
 
@@ -22,6 +23,23 @@ namespace PublicHolidaysExporter.Controllers
             return Enumerable.Range(currentYear - 20, 31).Reverse().ToList();
         }
 
+        private List<RecentHolidaySearch> GetRecentSearchesFromSession()
+        {
+            var json = HttpContext.Session.GetString("RecentSearches");
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return new List<RecentHolidaySearch>();
+            }
+
+            return JsonSerializer.Deserialize<List<RecentHolidaySearch>>(json) ?? new List<RecentHolidaySearch>();
+        }
+
+        private void SaveRecentSearchesToSession(List<RecentHolidaySearch> searches)
+        {
+            HttpContext.Session.SetString("RecentSearches", JsonSerializer.Serialize(searches));
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -32,6 +50,14 @@ namespace PublicHolidaysExporter.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult RecentSearches()
+        {
+            var searches = GetRecentSearchesFromSession();
+
+            return View(searches);
         }
 
         [HttpPost]
@@ -72,6 +98,23 @@ namespace PublicHolidaysExporter.Controllers
             try
             {
                 model.Holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Language, validFrom, validTo);
+
+                var searches = GetRecentSearchesFromSession();
+
+                searches.Insert(0, new RecentHolidaySearch
+                {
+                    CountryCode = model.CountryCode,
+                    Language = model.Language,
+                    Year = model.Year,
+                    UseDateRange = model.UseDateRange,
+                    ValidFrom = validFrom,
+                    ValidTo = validTo,
+                    Holidays = model.Holidays
+                });
+
+                searches = searches.Take(10).ToList();
+
+                SaveRecentSearchesToSession(searches);
             }
             catch
             {
@@ -106,6 +149,29 @@ namespace PublicHolidaysExporter.Controllers
             var csvBytes = _csvExportService.GenerateCsv(holidays, model.CountryCode, model.Language, validFrom, validTo);
 
             var fileName = $"public-holidays-{model.CountryCode.Trim().ToUpper()}-{model.Year}.csv";
+
+            return File(csvBytes, "text/csv", fileName);
+        }
+
+        [HttpPost]
+        public IActionResult DownloadRecentCsv(string id)
+        {
+            var searches = GetRecentSearchesFromSession();
+            var search = searches.FirstOrDefault(search => search.Id == id);
+
+            if (search == null)
+            {
+                return RedirectToAction(nameof(RecentSearches));
+            }
+
+            var csvBytes = _csvExportService.GenerateCsv(
+                search.Holidays,
+                search.CountryCode,
+                search.Language,
+                search.ValidFrom,
+                search.ValidTo);
+
+            var fileName = $"public-holidays-{search.CountryCode}-{search.ValidFrom:yyyy-MM-dd}-{search.ValidTo:yyyy-MM-dd}.csv";
 
             return File(csvBytes, "text/csv", fileName);
         }

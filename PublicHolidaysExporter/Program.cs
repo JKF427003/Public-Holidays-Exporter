@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 //builder.Services.AddScoped<IOpenHolidaysService, OpenHolidaysService>();
 builder.Services.AddHttpClient<IOpenHolidaysService, OpenHolidaysService>(client => { client.BaseAddress = new Uri("https://openholidaysapi.org/"); });
 builder.Services.AddScoped<ICsvExportService, CsvExportService>();
+builder.Services.AddSession();
 
 var app = builder.Build();
 
@@ -22,6 +23,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthorization();
 
