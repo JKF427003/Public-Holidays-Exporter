@@ -2,12 +2,6 @@ html {
   font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -19,4 +13,141 @@ html {
 
 body {
   margin-bottom: 60px;
+  background: #f5f7fb;
+  color: #1f2937;
+}
+
+.navbar {
+    background: #ffffff !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+    .page-header h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .page-header p {
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+.app-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-control,
+.form-select {
+    border-radius: 6px;
+    border-color: #d1d5db;
+}
+
+    .form-control:disabled,
+    .form-select:disabled {
+        background-color: #eef2f7;
+        color: #6b7280;
+    }
+
+.btn {
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.results-section {
+    margin-top: 1.5rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+    .table thead th {
+        background: #f3f4f6;
+        color: #374151;
+        font-weight: 700;
+    }
+
+.recent-search-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+    
+    .w-md-auto {
+        width: auto !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body {
+        margin-bottom: 80px;
+    }
+
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
+    }
+
+    .app-panel,
+    .recent-search-card {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .form-check {
+        margin-top: 0.5rem !important;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .footer {
+        font-size: 0.85rem;
+    }
 }
