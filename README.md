@@ -16,13 +16,16 @@ ASP.NET Core MVC application that retrieves public holidays from the OpenHoliday
 - Recent searches using session storage
 
 ## How to Run
+### Online
+- You can access the website which is hosted on the following link: https://public-holidays-exporter-jkf-daf2baarf6e4budq.italynorth-01.azurewebsites.net/
+
+### Using GitHub
 1. Clone the GitHub repository from: https://github.com/JKF427003/Public-Holidays-Exporter.git
 2. Open the solution in Visual Studio.
 3. Restore NuGet packages if needed.
 4. Run the project. (HTTPS preferred)
 5. Open the web application in your browser.
 
-- If needed or preferred, please ask the developer to quickly host the application, and they will send you the link to website. 
 
 ## How to Use
 1. Select a country.
