@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../PublicHolidaysExporter.Tests/PublicHolidaysExporter.Tests.csproj" Id="dab8e063-46c1-45a7-af2a-6342a2f169e9" />
   <Project Path="PublicHolidaysExporter.csproj" />
 </Solution>
