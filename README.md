@@ -49,6 +49,31 @@ The application handles:
 - Empty holiday results
 - CSV generation errors
 
+## Unit Testing
+
+The project includes basic unit tests using **xUnit** to verify the application's core functionality.
+
+### CSV Export Service
+
+The following scenarios are tested:
+- Generates a valid CSV file.
+- Includes the correct CSV headers.
+- Correctly exports holiday information.
+- Handles empty holiday collections without errors.
+
+### OpenHolidays Service
+
+The following scenarios are tested:
+- Correctly maps holiday data returned by the OpenHolidays API.
+- Uses the requested language when multiple translations are available.
+- Returns **"Unknown Holiday"** when a holiday name is unavailable.
+- Processes mocked API responses successfully without requiring a live connection to the OpenHolidays API.
+
+### Test Results
+
+- All implemented unit tests have passed successfully.
+- The current test suite focuses on the application's core services.
+
 ## Future Improvements
 - Accept alternative or native country names (e.g. Suomi → Finland, Deutschland → Germany).
 - Interactive map-based country selection for easier navigation.
