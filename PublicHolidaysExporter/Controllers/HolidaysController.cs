@@ -130,27 +130,49 @@ namespace PublicHolidaysExporter.Controllers
         [HttpPost]
         public async Task<IActionResult> DownloadCsv(HolidaySearchViewModel model)
         {
-            model.CountryCode = model.CountryCode.Trim().ToUpperInvariant();
-            model.Language = model.Language.Trim().ToUpperInvariant();
-
-            ModelState.Clear();
-
-            var validFrom = new DateTime(model.Year, 1, 1);
-            var validTo = new DateTime(model.Year, 12, 31);
-
-            if (model.UseDateRange && model.StartDate.HasValue && model.EndDate.HasValue)
+            try
             {
-                validFrom = model.StartDate.Value;
-                validTo = model.EndDate.Value;
+                model.CountryCode = model.CountryCode.Trim().ToUpperInvariant();
+                model.Language = model.Language.Trim().ToUpperInvariant();
+
+                var validFrom = new DateTime(model.Year, 1, 1);
+                var validTo = new DateTime(model.Year, 12, 31);
+
+                if (model.UseDateRange && model.StartDate.HasValue && model.EndDate.HasValue)
+                {
+                    validFrom = model.StartDate.Value;
+                    validTo = model.EndDate.Value;
+                }
+
+                var holidays = await _openHolidaysService.GetPublicHolidaysAsync(
+                    model.CountryCode,
+                    model.Language,
+                    validFrom,
+                    validTo
+                );
+
+                if (!holidays.Any())
+                {
+                    TempData["ErrorMessage"] = "No holidays were found to export.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var csvBytes = _csvExportService.GenerateCsv(
+                    holidays,
+                    model.CountryCode,
+                    model.Language,
+                    validFrom,
+                    validTo
+                );
+
+                var fileName = $"public-holidays-{model.CountryCode}-{model.Year}.csv";
+                return File(csvBytes, "text/csv", fileName);
             }
-
-            var holidays = await _openHolidaysService.GetPublicHolidaysAsync(model.CountryCode, model.Language, validFrom, validTo);
-
-            var csvBytes = _csvExportService.GenerateCsv(holidays, model.CountryCode, model.Language, validFrom, validTo);
-
-            var fileName = $"public-holidays-{model.CountryCode.Trim().ToUpper()}-{model.Year}.csv";
-
-            return File(csvBytes, "text/csv", fileName);
+            catch
+            {
+                TempData["ErrorMessage"] = "Could not generate the CSV file because the holiday API is currently unavailable.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
