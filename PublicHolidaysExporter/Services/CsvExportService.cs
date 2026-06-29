@@ -12,11 +12,11 @@ namespace PublicHolidaysExporter.Services
 
 
             csv.AppendLine("Public Holidays Export");
-            csv.AppendLine($"Country Code,{EscapeCsvValue(countryCode)}");
-            csv.AppendLine($"Language,{EscapeCsvValue(language)}");
             csv.AppendLine($"Date From,{validFrom:yyyy-MM-dd}");
             csv.AppendLine($"Date To,{validTo:yyyy-MM-dd}");
             csv.AppendLine($"Generated On,{DateTime.Now:yyyy-MM-dd HH:mm}");
+            csv.AppendLine($"Country Code,{EscapeCsvValue(countryCode)}");
+            csv.AppendLine($"Language,{EscapeCsvValue(language)}");
             csv.AppendLine();
 
             csv.AppendLine("Country Code, Language, Date, Name");

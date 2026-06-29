@@ -78,7 +78,7 @@ namespace PublicHolidaysExporter.Services
             
             var fallbackName = apiHoliday.Name.FirstOrDefault(name => !string.IsNullOrWhiteSpace(name.Text));
 
-            return fallbackName?.Text ?? "Unkown Holiday";
+            return fallbackName?.Text ?? "Unknown Holiday";
         }
 
         private class OpenCountryResponse
